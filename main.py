@@ -16,9 +16,12 @@ print(national_poll_on_healthy_aging_npha.metadata)
 print(X)
 # variable information 
 print(national_poll_on_healthy_aging_npha.variables) 
+
+# Combine two dataframe to have the final dataset
 npha=pd.concat([X, y], axis=1)
 print(npha)
-npha.columns
+
+# Rename the columns of the dataset
 new_name = {
     'Age': 'Age',
     'Physical_Health': 'Physical_Health',
@@ -29,7 +32,7 @@ new_name = {
     'Medication_Keeps_Patient_from_Sleeping': 'Sleep_Medication',
     'Pain_Keeps_Patient_from_Sleeping': 'Sleep_Pain',
     'Bathroom_Needs_Keeps_Patient_from_Sleeping': 'Sleep_Bathroom',
-    'Sleep_Unknown': 'Sleep_Unknown',
+    'Uknown_Keeps_Patient_from_Sleeping': 'Sleep_Unknown',
     'Trouble_Sleeping': 'Trouble_Sleep',
     'Prescription_Sleep_Medication': 'Presc_Medication',
     'Race': 'Race',
@@ -37,17 +40,14 @@ new_name = {
     'Number_of_Doctors_Visited': 'Num_Doctors'
 }
 npha = npha.rename(columns=new_name)
-npha = npha.rename(columns={'Uknown_Keeps_Patient_from_Sleeping': 'Sleep_Unknown'})
-npha.shape
 
-npha.columns
-id = range(1, 715)  # Génère des identifiants de 1 à 714
+ # Generating the ID
+id = range(1, 715) 
 
-# Ajouter la colonne d'identifiants à gauche du DataFrame
+# Adding the column ID in DataFrame 
 npha.insert(0, 'ID', id)
-print(npha)
-npha.shape
-# Chargement du dataframe dans MYSQL
+
+# Loading the dataframe in MYSQL
 try:
     connexion = mysql.connector.connect(host='localhost',
                                        database='tp_sid',
@@ -58,11 +58,12 @@ try:
 except Error as e:
     print(f"Erreur lors de la connexion à MySQL: {e}")
 
+
 try:
     cursor = connexion.cursor()
 
     for i,row in npha.iterrows():
-        sql = """INSERT INTO patients (Age, Physical_Health, Mental_Health, Dental_Health, Employment, Sleep_Stress, Sleep_Medication, Sleep_Pain, Sleep_Bathroom, Sleep_Unknown, Trouble_Sleep, Presc_Medication, Race, Gender, Num_Doctors) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+        sql = """INSERT INTO patients (ID,Age, Physical_Health, Mental_Health, Dental_Health, Employment, Sleep_Stress, Sleep_Medication, Sleep_Pain, Sleep_Bathroom, Sleep_Unknown, Trouble_Sleep, Presc_Medication, Race, Gender, Num_Doctors) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
         #print(sql)
         cursor.execute(sql, tuple(row))
 
